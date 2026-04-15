@@ -2,6 +2,8 @@
 
 Map Cortex XSOAR content pack dependencies from the CLI.
 
+[Charlie](/images/charlie.webp)
+
 ## Prereqs
 
 - Install uv from [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
