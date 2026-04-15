@@ -109,6 +109,7 @@ ignore = [
 "src/charlie/commands/scan.py" = ["B008"]
 "src/charlie/commands/setup.py" = ["S603", "S607"]
 "src/charlie/services/scanner.py" = ["S603", "S607"]
+"src/charlie/services/xsoar_downloader.py" = ["S603", "S607", "TRY003"]
 
 [tool.ruff.format]
 preview = true

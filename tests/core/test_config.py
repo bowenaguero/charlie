@@ -48,3 +48,19 @@ def test_set_repo_url_preserves_other_keys(cfg):
 
 def test_repo_local_path_is_a_path(cfg):
     assert isinstance(cfg.repo_local_path, Path)
+
+
+def test_get_content_source_defaults_to_git(cfg):
+    assert cfg.get_content_source() == "git"
+
+
+def test_set_and_get_content_source(cfg):
+    cfg.set_content_source("xsoar")
+    assert cfg.get_content_source() == "xsoar"
+
+
+def test_set_content_source_preserves_other_keys(cfg):
+    cfg.set_repo_url("https://github.com/example/content")
+    cfg.set_content_source("xsoar")
+    assert cfg.get_repo_url() == "https://github.com/example/content"
+    assert cfg.get_content_source() == "xsoar"
