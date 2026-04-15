@@ -53,7 +53,7 @@ def test_successful_download(env_vars, tmp_path):
 
     assert expected_pack_dir.exists()
     mock_run.assert_called_once_with(
-        ["demisto-sdk", "download", "--all-custom-content", "--output", str(expected_pack_dir)],
+        ["demisto-sdk", "download", "--all-custom-content", "--insecure", "--output", str(expected_pack_dir)],
         capture_output=True,
         text=True,
     )

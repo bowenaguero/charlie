@@ -27,7 +27,7 @@ def download_xsoar_content(content_root: Path) -> None:
     pack_dir.mkdir(parents=True)
 
     result = subprocess.run(
-        ["demisto-sdk", "download", "--all-custom-content", "--output", str(pack_dir)],
+        ["demisto-sdk", "download", "--all-custom-content", "--insecure", "--output", str(pack_dir)],
         capture_output=True,
         text=True,
     )
