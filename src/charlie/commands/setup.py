@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -15,10 +16,28 @@ _console = Console()
 def setup() -> None:
     """Configure charlie and sync the content repo (run this first)."""
     cfg = Config()
-    current_url = cfg.get_repo_url()
 
     _console.print("[bold cyan]charlie setup[/bold cyan]")
     _console.print("─" * 50)
+
+    source = typer.prompt("Content source [git/xsoar]", default="git").strip().lower()
+    if source not in ("git", "xsoar"):
+        _console.print("[red]error:[/red] choose 'git' or 'xsoar'")
+        raise typer.Exit(1)
+
+    cfg.set_content_source(source)
+
+    if source == "git":
+        _git_setup(cfg)
+    else:
+        _xsoar_setup(cfg)
+
+    _console.print(f"\n[green]✓[/green] Config saved to [bold]{cfg.path}[/bold]")
+    _console.print("\nRun [bold]charlie scan --target <name> --type <type>[/bold]")
+
+
+def _git_setup(cfg: Config) -> None:
+    current_url = cfg.get_repo_url()
 
     if current_url:
         _console.print(f"Current repo: [dim]{current_url}[/dim]")
@@ -51,8 +70,24 @@ def setup() -> None:
         _git_clone(url, local_path)
 
     run_index(cfg)
-    _console.print(f"\n[green]✓[/green] Config saved to [bold]{cfg.path}[/bold]")
-    _console.print("\nRun [bold]charlie scan --target <name> --type <type>[/bold]")
+
+
+def _xsoar_setup(cfg: Config) -> None:
+    from ..services.xsoar_downloader import _REQUIRED_ENV, download_xsoar_content
+
+    for var in _REQUIRED_ENV:
+        if not os.environ.get(var):
+            _console.print(f"[red]error:[/red] env var [bold]{var}[/bold] is not set")
+            raise typer.Exit(1)
+
+    with _console.status("Downloading content from XSOAR instance…"):
+        try:
+            download_xsoar_content(cfg.repo_local_path)
+        except RuntimeError as e:
+            _console.print(f"[red]error:[/red] {e}")
+            raise typer.Exit(1) from e
+
+    run_index(cfg)
 
 
 def run_index(cfg: Config) -> None:

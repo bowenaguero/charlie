@@ -13,6 +13,17 @@ def reindex() -> None:
     """Re-index the content repo (run after pulling changes manually)."""
     cfg = Config()
     if not cfg.repo_local_path.exists():
-        _console.print("[red]error:[/red] no repo found. Run [bold]charlie setup[/bold] first.")
+        _console.print("[red]error:[/red] no content found. Run [bold]charlie setup[/bold] first.")
         raise typer.Exit(1)
+
+    if cfg.get_content_source() == "xsoar":
+        from ..services.xsoar_downloader import download_xsoar_content
+
+        with _console.status("Re-downloading content from XSOAR instance…"):
+            try:
+                download_xsoar_content(cfg.repo_local_path)
+            except RuntimeError as e:
+                _console.print(f"[red]error:[/red] {e}")
+                raise typer.Exit(1) from e
+
     run_index(cfg)

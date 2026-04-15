@@ -45,3 +45,11 @@ class Config:
         data = self.load()
         data["repo_url"] = url
         self.save(data)
+
+    def get_content_source(self) -> str:
+        return self.load().get("content_source", "git")
+
+    def set_content_source(self, source: str) -> None:
+        data = self.load()
+        data["content_source"] = source
+        self.save(data)
