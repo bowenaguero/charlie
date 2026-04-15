@@ -1,11 +1,9 @@
 import sqlite3
-from pathlib import Path
 
 import pytest
 
-from charlie.services.indexer import build_index
 from charlie.core.models import ComponentType
-
+from charlie.services.indexer import build_index
 
 PLAYBOOK_YAML = """\
 id: Index Test Playbook

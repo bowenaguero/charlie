@@ -30,10 +30,7 @@ def render_tree(result: ScanResult, console: Console | None = None) -> None:
         console = Console()
 
     target_color = _TYPE_COLORS.get(result.target_type, "white")
-    root_label = (
-        f"[bold {target_color}]{result.target}[/bold {target_color}]"
-        f" [dim]({result.target_type.value})[/dim]"
-    )
+    root_label = f"[bold {target_color}]{result.target}[/bold {target_color}] [dim]({result.target_type.value})[/dim]"
     tree = Tree(root_label)
 
     grouped: dict[str, list[ComponentRef]] = defaultdict(list)
@@ -58,16 +55,14 @@ def render_tree(result: ScanResult, console: Console | None = None) -> None:
     console.print(tree)
     total = len(result.refs)
     sources = len(grouped)
-    console.print(
-        f"\n[bold]{total}[/bold] reference(s) across [bold]{sources}[/bold] component(s)"
-    )
+    console.print(f"\n[bold]{total}[/bold] reference(s) across [bold]{sources}[/bold] component(s)")
 
 
 def render_html(graph: nx.DiGraph, output_path: Path) -> None:
     try:
         from pyvis.network import Network
     except ImportError as exc:
-        raise ImportError("pyvis is required for HTML output: pip install pyvis") from exc
+        raise ImportError("pyvis is required for HTML output: pip install pyvis") from exc  # noqa: TRY003
 
     net = Network(
         height="750px",
@@ -109,7 +104,7 @@ def render_html(graph: nx.DiGraph, output_path: Path) -> None:
 
 
 def export_dot(graph: nx.DiGraph, output_path: Path) -> None:
-    lines = ['digraph charlie {', '  rankdir="LR";', '  node [fontname="Arial"];']
+    lines = ["digraph charlie {", '  rankdir="LR";', '  node [fontname="Arial"];']
 
     for node, attrs in graph.nodes(data=True):
         ct_value = attrs.get("component_type", "")
@@ -117,10 +112,7 @@ def export_dot(graph: nx.DiGraph, output_path: Path) -> None:
         label = node.replace('"', '\\"')
         fill = "red" if is_target else "lightblue"
         shape = "doublecircle" if is_target else "box"
-        lines.append(
-            f'  "{label}" [label="{label}\\n({ct_value})" style=filled'
-            f' fillcolor="{fill}" shape="{shape}"];'
-        )
+        lines.append(f'  "{label}" [label="{label}\\n({ct_value})" style=filled fillcolor="{fill}" shape="{shape}"];')
 
     for src, dst, attrs in graph.edges(data=True):
         s = src.replace('"', '\\"')

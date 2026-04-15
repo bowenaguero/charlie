@@ -57,6 +57,7 @@ def setup() -> None:
 
 def run_index(cfg: Config) -> None:
     from ..services.indexer import build_index
+
     with _console.status("Indexing repo…"):
         stats = build_index(cfg.repo_local_path, cfg.db_path)
     _console.print(

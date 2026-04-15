@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from charlie.services.db import init_db, query_refs
 from charlie.core.models import ComponentType, MatchKind
+from charlie.services.db import init_db, query_refs
 
 
 @pytest.fixture()

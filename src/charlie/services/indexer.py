@@ -7,16 +7,17 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from .db import init_db
 from ..core.models import ComponentType, MatchKind
+from .db import init_db
 from .scanner import _iter_playbook_yamls, _source_name
-
 
 _DQ_PATTERN = re.compile(r"\$\{(?:incident|CustomFields)\.([^}]+)\}")
 
 _FIELD_SETTERS = frozenset({
-    "setIncident", "Builtin|||setIncident",
-    "setIndicator", "Builtin|||setIndicator",
+    "setIncident",
+    "Builtin|||setIncident",
+    "setIndicator",
+    "Builtin|||setIndicator",
 })
 
 
@@ -62,8 +63,15 @@ def build_index(repo: Path, db_path: Path) -> IndexStats:
                        (source_id, target_name, target_type, yaml_path, line, match_kind, context)
                        VALUES (?, ?, ?, ?, ?, ?, ?)""",
                     [
-                        (source_id, r["target_name"], r["target_type"],
-                         r["yaml_path"], r["line"], r["match_kind"], r["context"])
+                        (
+                            source_id,
+                            r["target_name"],
+                            r["target_type"],
+                            r["yaml_path"],
+                            r["line"],
+                            r["match_kind"],
+                            r["context"],
+                        )
                         for r in raw_refs
                     ],
                 )
@@ -111,26 +119,30 @@ def _refs_from_task(task_id: str, task_entry: dict, task_def: dict, task_type: s
         name = pb_id or pb_name
         field = "playbookId" if pb_id else ("playbookName" if pb_name else None)
         if name and field:
-            refs.append(_raw_ref(
-                target_name=name,
-                target_type=ComponentType.PLAYBOOK,
-                yaml_path=f"tasks.{task_id}.task.{field}",
-                line=_key_line(task_def, field),
-                context=task_name,
-            ))
+            refs.append(
+                _raw_ref(
+                    target_name=name,
+                    target_type=ComponentType.PLAYBOOK,
+                    yaml_path=f"tasks.{task_id}.task.{field}",
+                    line=_key_line(task_def, field),
+                    context=task_name,
+                )
+            )
 
     elif task_type == "regular":
         script = task_def.get("script") or task_def.get("scriptName", "")
         if script:
             field = "script" if "script" in task_def else "scriptName"
             is_cmd = bool(task_def.get("iscommand", False))
-            refs.append(_raw_ref(
-                target_name=script,
-                target_type=ComponentType.INTEGRATION_COMMAND if is_cmd else ComponentType.AUTOMATION,
-                yaml_path=f"tasks.{task_id}.task.{field}",
-                line=_key_line(task_def, field),
-                context=task_name,
-            ))
+            refs.append(
+                _raw_ref(
+                    target_name=script,
+                    target_type=ComponentType.INTEGRATION_COMMAND if is_cmd else ComponentType.AUTOMATION,
+                    yaml_path=f"tasks.{task_id}.task.{field}",
+                    line=_key_line(task_def, field),
+                    context=task_name,
+                )
+            )
 
     refs.extend(_field_refs_from_scriptargs(task_id, task_entry, task_def, task_name))
     return refs
@@ -148,20 +160,20 @@ def _field_refs_from_scriptargs(
         return refs
 
     script = task_def.get("script") or task_def.get("scriptName", "")
-    is_setter = script in _FIELD_SETTERS or any(
-        script.endswith(f"|||{s.split('|||')[-1]}") for s in _FIELD_SETTERS
-    )
+    is_setter = script in _FIELD_SETTERS or any(script.endswith(f"|||{s.split('|||')[-1]}") for s in _FIELD_SETTERS)
 
     # Write refs: argument keys on field-setter commands
     if is_setter:
         for arg_key in script_args:
-            refs.append(_raw_ref(
-                target_name=arg_key,
-                target_type=ComponentType.FIELD,
-                yaml_path=f"tasks.{task_id}.scriptarguments.{arg_key}",
-                line=_key_line(script_args, arg_key),
-                context=task_name,
-            ))
+            refs.append(
+                _raw_ref(
+                    target_name=arg_key,
+                    target_type=ComponentType.FIELD,
+                    yaml_path=f"tasks.{task_id}.scriptarguments.{arg_key}",
+                    line=_key_line(script_args, arg_key),
+                    context=task_name,
+                )
+            )
 
     # Read refs: ${incident.X} / ${CustomFields.X} expressions in argument values
     for arg_key, arg_val in script_args.items():
@@ -169,13 +181,15 @@ def _field_refs_from_scriptargs(
         if not text:
             continue
         for m in _DQ_PATTERN.finditer(text):
-            refs.append(_raw_ref(
-                target_name=m.group(1),
-                target_type=ComponentType.FIELD,
-                yaml_path=f"tasks.{task_id}.scriptarguments.{arg_key}",
-                line=_key_line(script_args, arg_key),
-                context=task_name,
-            ))
+            refs.append(
+                _raw_ref(
+                    target_name=m.group(1),
+                    target_type=ComponentType.FIELD,
+                    yaml_path=f"tasks.{task_id}.scriptarguments.{arg_key}",
+                    line=_key_line(script_args, arg_key),
+                    context=task_name,
+                )
+            )
 
     return refs
 

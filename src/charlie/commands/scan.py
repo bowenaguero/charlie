@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import webbrowser
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich.console import Console
@@ -19,7 +19,7 @@ _console = Console()
 def scan(
     target: str = typer.Option(..., "--target", "-t", help="Name of the component to trace"),
     component_type: ComponentType = typer.Option(..., "--type", help="Component type to trace"),
-    repo: Annotated[Optional[Path], typer.Option("--repo", "-r", help="Override repo path (skips managed clone)")] = None,
+    repo: Annotated[Path | None, typer.Option("--repo", "-r", help="Override repo path (skips managed clone)")] = None,
     output: str = typer.Option("tree", "--output", "-o", help="Output format: tree | html | dot"),
     html_out: Path = typer.Option(Path("charlie_output.html"), "--html-out", help="HTML output path"),
     dot_out: Path = typer.Option(Path("charlie_output.dot"), "--dot-out", help="DOT output path"),
@@ -40,9 +40,7 @@ def scan(
         _console.print(f"[red]error:[/red] repo path does not exist: {resolved_repo}")
         raise typer.Exit(1)
 
-    _console.print(
-        f"Scanning for references to [bold]{target}[/bold] [dim]({component_type.value})[/dim]…"
-    )
+    _console.print(f"Scanning for references to [bold]{target}[/bold] [dim]({component_type.value})[/dim]…")
 
     result = scan_repo(resolved_repo, target, component_type, db_path=cfg.db_path)
 

@@ -114,8 +114,11 @@ _LEGACY_FILE = Path("/repo/playbook-Legacy.yml")
 
 # --- automation matching ---
 
+
 def test_automation_ref_found():
-    refs = _scan_playbook_yaml(_FILE, _load(PLAYBOOK_YAML), "TargetAutomation", ComponentType.AUTOMATION, "Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FILE, _load(PLAYBOOK_YAML), "TargetAutomation", ComponentType.AUTOMATION, "Test Playbook"
+    )
     assert len(refs) == 1
     ref = refs[0]
     assert ref.source_name == "Test Playbook"
@@ -126,7 +129,9 @@ def test_automation_ref_found():
 
 
 def test_automation_falls_back_to_scriptname_field():
-    refs = _scan_playbook_yaml(_LEGACY_FILE, _load(LEGACY_PLAYBOOK_YAML), "LegacyAutomation", ComponentType.AUTOMATION, "Legacy Playbook")
+    refs = _scan_playbook_yaml(
+        _LEGACY_FILE, _load(LEGACY_PLAYBOOK_YAML), "LegacyAutomation", ComponentType.AUTOMATION, "Legacy Playbook"
+    )
     assert len(refs) == 1
     assert refs[0].location.yaml_path == "tasks.1.task.scriptName"
 
@@ -138,6 +143,7 @@ def test_automation_not_matched_when_iscommand_true():
 
 # --- playbook matching ---
 
+
 def test_playbook_ref_found_via_playbookId():
     refs = _scan_playbook_yaml(_FILE, _load(PLAYBOOK_YAML), "TargetPlaybook", ComponentType.PLAYBOOK, "Test Playbook")
     assert len(refs) == 1
@@ -146,7 +152,9 @@ def test_playbook_ref_found_via_playbookId():
 
 
 def test_playbook_ref_found_via_playbookName():
-    refs = _scan_playbook_yaml(_FILE, _load(PLAYBOOK_YAML), "TargetPlaybookByName", ComponentType.PLAYBOOK, "Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FILE, _load(PLAYBOOK_YAML), "TargetPlaybookByName", ComponentType.PLAYBOOK, "Test Playbook"
+    )
     assert len(refs) == 1
     assert refs[0].location.yaml_path == "tasks.3.task.playbookName"
 
@@ -158,8 +166,11 @@ def test_playbook_not_matched_for_automation_task():
 
 # --- integration-command matching ---
 
+
 def test_integration_command_brand_prefix():
-    refs = _scan_playbook_yaml(_FILE, _load(PLAYBOOK_YAML), "send-mail", ComponentType.INTEGRATION_COMMAND, "Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FILE, _load(PLAYBOOK_YAML), "send-mail", ComponentType.INTEGRATION_COMMAND, "Test Playbook"
+    )
     # matches both "Gmail|||send-mail" (task 4) and direct "send-mail" (task 5)
     assert len(refs) == 2
     yaml_paths = {r.location.yaml_path for r in refs}
@@ -168,7 +179,9 @@ def test_integration_command_brand_prefix():
 
 
 def test_integration_command_not_matched_for_automation_task():
-    refs = _scan_playbook_yaml(_FILE, _load(PLAYBOOK_YAML), "TargetAutomation", ComponentType.INTEGRATION_COMMAND, "Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FILE, _load(PLAYBOOK_YAML), "TargetAutomation", ComponentType.INTEGRATION_COMMAND, "Test Playbook"
+    )
     assert refs == []
 
 
@@ -254,7 +267,9 @@ _FIELD_FILE = Path("/repo/playbook-FieldTest.yml")
 
 
 def test_field_write_ref_setincident():
-    refs = _scan_playbook_yaml(_FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook"
+    )
     write_refs = [r for r in refs if r.location.yaml_path == "tasks.1.scriptarguments.severity"]
     assert len(write_refs) == 1
     assert write_refs[0].match_kind == MatchKind.YAML_STRUCTURED
@@ -262,40 +277,52 @@ def test_field_write_ref_setincident():
 
 
 def test_field_write_ref_setindicator():
-    refs = _scan_playbook_yaml(_FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook"
+    )
     indicator_refs = [r for r in refs if r.location.yaml_path == "tasks.5.scriptarguments.severity"]
     assert len(indicator_refs) == 1
 
 
 def test_field_no_match_wrong_key_in_setter():
-    refs = _scan_playbook_yaml(_FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "nonexistent", ComponentType.FIELD, "Field Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "nonexistent", ComponentType.FIELD, "Field Test Playbook"
+    )
     structured = [r for r in refs if r.match_kind == MatchKind.YAML_STRUCTURED]
     assert structured == []
 
 
 def test_field_no_write_match_in_non_setter():
     # task 4 has 'severity' as a scriptarguments key but calls a non-setter script
-    refs = _scan_playbook_yaml(_FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook"
+    )
     non_setter_refs = [r for r in refs if "tasks.4" in (r.location.yaml_path or "")]
     assert non_setter_refs == []
 
 
 def test_field_read_ref_incident_dq():
-    refs = _scan_playbook_yaml(_FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook"
+    )
     dq_refs = [r for r in refs if r.location.yaml_path == "tasks.3.scriptarguments.message"]
     assert len(dq_refs) == 1
     assert dq_refs[0].context == "Send notification"
 
 
 def test_field_read_ref_customfields_dq():
-    refs = _scan_playbook_yaml(_FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook"
+    )
     dq_refs = [r for r in refs if r.location.yaml_path == "tasks.3.scriptarguments.subject"]
     assert len(dq_refs) == 1
 
 
 def test_field_total_refs_for_severity():
     # task1 (setter key) + task5 (indicator setter key) + task3 message (incident DQ) + task3 subject (CustomFields DQ)
-    refs = _scan_playbook_yaml(_FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook")
+    refs = _scan_playbook_yaml(
+        _FIELD_FILE, _load(FIELD_PLAYBOOK_YAML), "severity", ComponentType.FIELD, "Field Test Playbook"
+    )
     structured = [r for r in refs if r.match_kind == MatchKind.YAML_STRUCTURED]
     assert len(structured) == 4
 
@@ -313,36 +340,44 @@ def test_no_tasks_returns_empty():
 
 # --- source type detection ---
 
-@pytest.mark.parametrize("path,expected", [
-    # nested / Packs-style (directory-based)
-    (Path("/repo/Pack/Playbooks/playbook-Test.yml"), ComponentType.PLAYBOOK),
-    (Path("/repo/Pack/Scripts/MyScript/MyScript.py"), ComponentType.AUTOMATION),
-    (Path("/repo/Pack/Automations/MyAuto/MyAuto.yml"), ComponentType.AUTOMATION),
-    (Path("/repo/Pack/Integrations/MyInt/MyInt.yml"), ComponentType.INTEGRATION_COMMAND),
-    # flat repo (prefix-based)
-    (Path("/repo/playbook-Something.yml"), ComponentType.PLAYBOOK),
-    (Path("/repo/automation-Something.yml"), ComponentType.AUTOMATION),
-    (Path("/repo/integration-Something.yml"), ComponentType.INTEGRATION_COMMAND),
-    # fallback
-    (Path("/repo/README.md"), ComponentType.PLAYBOOK),
-])
+
+@pytest.mark.parametrize(
+    "path,expected",
+    [
+        # nested / Packs-style (directory-based)
+        (Path("/repo/Pack/Playbooks/playbook-Test.yml"), ComponentType.PLAYBOOK),
+        (Path("/repo/Pack/Scripts/MyScript/MyScript.py"), ComponentType.AUTOMATION),
+        (Path("/repo/Pack/Automations/MyAuto/MyAuto.yml"), ComponentType.AUTOMATION),
+        (Path("/repo/Pack/Integrations/MyInt/MyInt.yml"), ComponentType.INTEGRATION_COMMAND),
+        # flat repo (prefix-based)
+        (Path("/repo/playbook-Something.yml"), ComponentType.PLAYBOOK),
+        (Path("/repo/automation-Something.yml"), ComponentType.AUTOMATION),
+        (Path("/repo/integration-Something.yml"), ComponentType.INTEGRATION_COMMAND),
+        # fallback
+        (Path("/repo/README.md"), ComponentType.PLAYBOOK),
+    ],
+)
 def test_source_type_from_path(path, expected):
     assert _source_type_from_path(path) == expected
 
 
 # --- source name extraction ---
 
-@pytest.mark.parametrize("path,expected", [
-    # flat repo
-    (Path("/repo/playbook-SomeName.yml"), "SomeName"),
-    (Path("/repo/playbook_OtherName.yml"), "OtherName"),
-    (Path("/repo/automation-MyScript.yml"), "MyScript"),
-    (Path("/repo/integration-MyInteg.yml"), "MyInteg"),
-    (Path("/repo/incidentfield-MyField.json"), "MyField"),
-    # nested / Packs-style
-    (Path("/repo/Pack/Playbooks/playbook-SomeName.yml"), "SomeName"),
-    (Path("/repo/Pack/Scripts/MyScript/MyScript.py"), "MyScript"),
-])
+
+@pytest.mark.parametrize(
+    "path,expected",
+    [
+        # flat repo
+        (Path("/repo/playbook-SomeName.yml"), "SomeName"),
+        (Path("/repo/playbook_OtherName.yml"), "OtherName"),
+        (Path("/repo/automation-MyScript.yml"), "MyScript"),
+        (Path("/repo/integration-MyInteg.yml"), "MyInteg"),
+        (Path("/repo/incidentfield-MyField.json"), "MyField"),
+        # nested / Packs-style
+        (Path("/repo/Pack/Playbooks/playbook-SomeName.yml"), "SomeName"),
+        (Path("/repo/Pack/Scripts/MyScript/MyScript.py"), "MyScript"),
+    ],
+)
 def test_source_name_from_path(path, expected):
     assert _source_name_from_path(path) == expected
 

@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import sqlite3
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Generator
 
 from ..core.models import ComponentRef, ComponentType, MatchKind, MatchLocation, ScanResult
-
 
 _SCHEMA = """
 PRAGMA journal_mode=WAL;
@@ -77,16 +76,18 @@ def query_refs(db_path: Path, target_name: str, target_type: ComponentType) -> S
             ).fetchall()
 
         for row in rows:
-            result.refs.append(ComponentRef(
-                source_name=row["name"],
-                source_type=ComponentType(row["type"]),
-                location=MatchLocation(
-                    file=Path(row["file_path"]),
-                    line=row["line"],
-                    yaml_path=row["yaml_path"],
-                ),
-                context=row["context"],
-                match_kind=MatchKind(row["match_kind"]),
-            ))
+            result.refs.append(
+                ComponentRef(
+                    source_name=row["name"],
+                    source_type=ComponentType(row["type"]),
+                    location=MatchLocation(
+                        file=Path(row["file_path"]),
+                        line=row["line"],
+                        yaml_path=row["yaml_path"],
+                    ),
+                    context=row["context"],
+                    match_kind=MatchKind(row["match_kind"]),
+                )
+            )
 
     return result

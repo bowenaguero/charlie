@@ -20,7 +20,7 @@ def test_match_kind_values():
 def test_match_location_is_immutable():
     loc = MatchLocation(file=Path("/test.yml"), line=10)
     with pytest.raises((AttributeError, TypeError)):
-        loc.line = 99  # type: ignore[misc]
+        loc.line = 99  # type: ignore
 
 
 def test_match_location_defaults():

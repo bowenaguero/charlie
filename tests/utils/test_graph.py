@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from charlie.utils.graph import build_graph
 from charlie.core.models import ComponentRef, ComponentType, MatchKind, MatchLocation, ScanResult
+from charlie.utils.graph import build_graph
 
 
 def _ref(source: str, source_type: ComponentType = ComponentType.PLAYBOOK) -> ComponentRef:
