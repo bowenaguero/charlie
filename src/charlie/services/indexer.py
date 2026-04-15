@@ -44,17 +44,14 @@ def build_index(repo: Path, db_path: Path) -> IndexStats:
         for file_path, yaml_data in _iter_playbook_yamls(repo):
             source_name = _source_name(file_path, yaml_data)
 
-            cursor = conn.execute(
+            conn.execute(
                 "INSERT OR IGNORE INTO components (name, type, file_path) VALUES (?, ?, ?)",
                 (source_name, ComponentType.PLAYBOOK.value, str(file_path)),
             )
-            if cursor.lastrowid:
-                source_id = cursor.lastrowid
-            else:
-                source_id = conn.execute(
-                    "SELECT id FROM components WHERE name = ? AND type = ?",
-                    (source_name, ComponentType.PLAYBOOK.value),
-                ).fetchone()[0]
+            source_id = conn.execute(
+                "SELECT id FROM components WHERE name = ? AND type = ?",
+                (source_name, ComponentType.PLAYBOOK.value),
+            ).fetchone()[0]
 
             raw_refs = _extract_all_refs(yaml_data)
             if raw_refs:

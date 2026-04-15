@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 import shutil
 import subprocess
@@ -11,6 +12,7 @@ from rich.console import Console
 from ..core.config import Config
 
 _console = Console()
+log = logging.getLogger(__name__)
 
 
 def setup() -> None:
@@ -80,6 +82,7 @@ def _xsoar_setup(cfg: Config) -> None:
             _console.print(f"[red]error:[/red] env var [bold]{var}[/bold] is not set")
             raise typer.Exit(1)
 
+    log.debug("content_root: %s", cfg.repo_local_path)
     with _console.status("Downloading content from XSOAR instance…"):
         try:
             download_xsoar_content(cfg.repo_local_path)
