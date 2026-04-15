@@ -82,6 +82,7 @@ def test_failed_download_raises(env_vars, tmp_path):
     content_root = tmp_path / "content"
     mock_result = MagicMock()
     mock_result.returncode = 1
+    mock_result.stdout = ""
     mock_result.stderr = "connection refused"
 
     with (
@@ -90,3 +91,17 @@ def test_failed_download_raises(env_vars, tmp_path):
         pytest.raises(RuntimeError, match="connection refused"),
     ):
         download_xsoar_content(content_root)
+
+
+def test_partial_failure_does_not_raise(env_vars, tmp_path):
+    content_root = tmp_path / "content"
+    mock_result = MagicMock()
+    mock_result.returncode = 1
+    mock_result.stdout = "Successful downloads: 1488\nFailed downloads: 1\nDownload failed."
+    mock_result.stderr = ""
+
+    with (
+        patch("shutil.which", return_value="/usr/local/bin/demisto-sdk"),
+        patch("subprocess.run", return_value=mock_result),
+    ):
+        download_xsoar_content(content_root)  # should not raise

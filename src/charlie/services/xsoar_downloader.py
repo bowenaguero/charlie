@@ -44,4 +44,23 @@ def download_xsoar_content(content_root: Path) -> None:
         log.debug("stderr:\n%s", result.stderr.strip())
 
     if result.returncode != 0:
-        raise RuntimeError(f"demisto-sdk download failed:\n{result.stderr.strip()}")
+        successful = _parse_successful_count(result.stdout)
+        if successful > 0:
+            # Partial failure — some items couldn't be downloaded (e.g. unsupported type).
+            # Log a warning and continue; the successfully downloaded content is usable.
+            log.warning(
+                "demisto-sdk download completed with errors (%d succeeded). Run with -v for details.",
+                successful,
+            )
+        else:
+            raise RuntimeError(f"demisto-sdk download failed:\n{(result.stderr or result.stdout).strip()}")
+
+
+def _parse_successful_count(stdout: str) -> int:
+    for line in stdout.splitlines():
+        if line.startswith("Successful downloads:"):
+            try:
+                return int(line.split(":", 1)[1].strip())
+            except ValueError:
+                return 0
+    return 0
