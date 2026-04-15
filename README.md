@@ -2,7 +2,7 @@
 
 Map Cortex XSOAR content pack dependencies from the CLI.
 
-[Charlie](/images/charlie.webp)
+![Charlie](/images/charlie.webp)
 
 ## Prereqs
 
