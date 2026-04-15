@@ -1,0 +1,31 @@
+{
+    "name": "charlie",
+    "image": "mcr.microsoft.com/devcontainers/python:2-3.12-bookworm",
+    "features": {
+      "ghcr.io/devcontainers-extra/features/uv:1": {},
+      "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "ms-python.python",
+          "ms-python.vscode-pylance",
+          "ms-python.debugpy",
+          "charliermarsh.ruff",
+          "tamasfe.even-better-toml"
+        ],
+        "settings": {
+          "python.defaultInterpreterPath": "/workspaces/charlie/.venv/bin/python",
+          "editor.formatOnSave": true,
+          "[python]": {
+            "editor.defaultFormatter": "charliermarsh.ruff",
+            "editor.codeActionsOnSave": {
+              "source.fixAll": "explicit",
+              "source.organizeImports": "explicit"
+            }
+          }
+        }
+      }
+    },
+    "postCreateCommand": "./.devcontainer/postCreateCommand.sh"
+  }
