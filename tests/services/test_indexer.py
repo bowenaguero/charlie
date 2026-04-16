@@ -271,6 +271,12 @@ name: Gmail
 commonfields:
   id: Gmail
 defaultclassifier: Gmail Classifier
+script:
+  commands:
+    - name: send-mail
+      description: Send an email
+    - name: get-mail
+      description: Retrieve emails
 """
 
 
@@ -307,6 +313,19 @@ def test_integration_classifier_ref(indexed_integration_db):
     ).fetchall()
     conn.close()
     assert len(rows) == 1
+
+
+def test_integration_commands_indexed(indexed_integration_db):
+    conn = sqlite3.connect(indexed_integration_db)
+    names = {
+        r[0]
+        for r in conn.execute(
+            "SELECT name FROM components WHERE type=?",
+            (ComponentType.INTEGRATION_COMMAND.value,),
+        ).fetchall()
+    }
+    conn.close()
+    assert names == {"send-mail", "get-mail"}
 
 
 # ── CLASSIFIER ───────────────────────────────────────────────────────────────

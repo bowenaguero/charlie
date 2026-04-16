@@ -50,9 +50,12 @@ def build_index(repo: Path, db_path: Path) -> IndexStats:
 
         # Pass 1: insert all recognized components as nodes
         component_rows: list[tuple[str, str, str]] = []
-        for file_path, _ct, name, _data in _iter_all_component_files(repo):
+        for file_path, _ct, name, data in _iter_all_component_files(repo):
             component_rows.append((name, _ct.value, str(file_path)))
             files_indexed += 1
+            if _ct == ComponentType.INTEGRATION:
+                # Commands are sub-entities of the integration file, not standalone files
+                component_rows.extend(_integration_command_rows(data, file_path))
 
         conn.executemany(
             "INSERT OR IGNORE INTO components (name, type, file_path) VALUES (?, ?, ?)",
@@ -193,6 +196,20 @@ def _refs_from_integration(data: dict, source_name: str) -> list[dict]:
             line=_key_line(data, "defaultclassifier") or _key_line(data, "defaultClassifier"),
             context=f"integration:{source_name}",
         )
+    ]
+
+
+def _integration_command_rows(data: dict, file_path: Path) -> list[tuple[str, str, str]]:
+    script = data.get("script")
+    if not isinstance(script, dict):
+        return []
+    commands = script.get("commands")
+    if not isinstance(commands, list):
+        return []
+    return [
+        (cmd["name"].strip(), ComponentType.INTEGRATION_COMMAND.value, str(file_path))
+        for cmd in commands
+        if isinstance(cmd, dict) and isinstance(cmd.get("name"), str) and cmd["name"].strip()
     ]
 
 
