@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.5](https://github.com/bowenaguero/charlie/compare/charlie-v0.1.4...charlie-v0.1.5) (2026-04-16)
+
+
+### Features
+
+* add interactive fuzzy search command ([#12](https://github.com/bowenaguero/charlie/issues/12)) ([35652e8](https://github.com/bowenaguero/charlie/commit/35652e8b003ffe7b167d2b6d7c6f9beccda7534d))
+* index all component types as first-class nodes ([#13](https://github.com/bowenaguero/charlie/issues/13)) ([3112dbf](https://github.com/bowenaguero/charlie/commit/3112dbf0ce5179e3c348867d751a1c695ac6f94b))
+
+
+### Documentation
+
+* clarify background and usage descriptions in README ([76d5109](https://github.com/bowenaguero/charlie/commit/76d5109aff368c525616beedbc1fcdddb66e5374))
+* enhance README with additional background and usage examples ([0250d93](https://github.com/bowenaguero/charlie/commit/0250d93c10bc17b52337d9a5c51bbae09bcf41b2))
+
 ## [0.1.4](https://github.com/bowenaguero/charlie/compare/charlie-v0.1.3...charlie-v0.1.4) (2026-04-16)
 
 
