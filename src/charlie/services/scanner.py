@@ -19,6 +19,10 @@ _DIR_TO_TYPE: dict[str, ComponentType] = {
     "Scripts": ComponentType.AUTOMATION,
     "Automations": ComponentType.AUTOMATION,
     "Integrations": ComponentType.INTEGRATION_COMMAND,
+    "Layouts": ComponentType.LAYOUT,
+    "Lists": ComponentType.LIST,
+    "Classifiers": ComponentType.CLASSIFIER,
+    "IncidentTypes": ComponentType.INCIDENT_TYPE,
 }
 
 # Filename prefix → type (flat repos where everything lives at root)
@@ -27,9 +31,24 @@ _PREFIX_TO_TYPE: dict[str, ComponentType] = {
     "automation": ComponentType.AUTOMATION,
     "script": ComponentType.AUTOMATION,
     "integration": ComponentType.INTEGRATION_COMMAND,
+    "layout": ComponentType.LAYOUT,
+    "list": ComponentType.LIST,
+    "classifier": ComponentType.CLASSIFIER,
+    "incidenttype": ComponentType.INCIDENT_TYPE,
 }
 
-_TYPE_DIR_NAMES = {"Playbooks", "Scripts", "Automations", "Integrations", "IncidentFields", "IndicatorFields"}
+_TYPE_DIR_NAMES = {
+    "Playbooks",
+    "Scripts",
+    "Automations",
+    "Integrations",
+    "IncidentFields",
+    "IndicatorFields",
+    "Layouts",
+    "Lists",
+    "Classifiers",
+    "IncidentTypes",
+}
 
 _STEM_PREFIXES = (
     "playbook-",
@@ -42,6 +61,14 @@ _STEM_PREFIXES = (
     "integration_",
     "incidentfield-",
     "indicatorfield-",
+    "layout-",
+    "layout_",
+    "list-",
+    "list_",
+    "classifier-",
+    "classifier_",
+    "incidenttype-",
+    "incidenttype_",
 )
 
 # Commands that write incident/indicator fields; the argument keys are field cliNames.
@@ -146,6 +173,8 @@ def _match_task(
             return _match_command_task(file_path, task_id, task_def, task_type, target, source_name)
         case ComponentType.FIELD:
             return _match_field_task(file_path, task_id, task_entry, task_def, target, source_name)
+        case ComponentType.LAYOUT | ComponentType.LIST | ComponentType.CLASSIFIER | ComponentType.INCIDENT_TYPE:
+            return []
     return []
 
 
