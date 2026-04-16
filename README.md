@@ -6,9 +6,9 @@ Map Cortex XSOAR content pack dependencies from the CLI.
 
 ## Background
 
-XSOAR playbooks reference automations, integration commands, sub-playbooks, fields, layouts, and more — often across dozens of content packs. Understanding what depends on what before making a change is painful without tooling.
+XSOAR content packs are deeply interconnected — automations, integrations, fields, layouts, classifiers, and incident types can all be referenced by other components across dozens of packs. Understanding the full blast radius of a change is painful without tooling.
 
-Charlie indexes your content repository into a local SQLite database, then lets you query dependency relationships in seconds. Given any component, it tells you which of your components use it, and renders the result as a tree, an interactive HTML graph, or a DOT file for downstream tooling.
+Charlie indexes your content repository into a local SQLite database and maps those relationships. Given any component, it tells you what depends on it — and renders the result as a tree, an interactive HTML graph, or a DOT file for downstream tooling.
 
 ## Prereqs
 
