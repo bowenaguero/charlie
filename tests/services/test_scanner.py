@@ -409,7 +409,7 @@ def test_ripgrep_hit_from_invalid_source_is_excluded(tmp_path):
         '{"id": "agent-mail-rule-analyst", "name": "agent-mail-rule-analyst"}'
     )
     result = scan(tmp_path, "agent-mail-rule-analyst", ComponentType.LIST)
-    # Only valid source for LIST is PLAYBOOK; hits from list files must be dropped.
+    # Only valid source for LIST is PLAYBOOK/AUTOMATION; hits from list files must be dropped.
     assert all(r.source_type != ComponentType.LIST for r in result.refs)
 
 

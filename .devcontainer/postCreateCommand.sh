@@ -3,6 +3,9 @@
 # Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
+# Install system dependencies
+sudo apt-get install -y ripgrep
+
 # Install Dependencies
 uv sync
 
