@@ -9,6 +9,7 @@ from charlie.services.scanner import (
     _scan_playbook_yaml,
     _source_name_from_path,
     _source_type_from_path,
+    scan,
 )
 
 _yaml = YAML()
@@ -348,7 +349,7 @@ def test_no_tasks_returns_empty():
         (Path("/repo/Pack/Playbooks/playbook-Test.yml"), ComponentType.PLAYBOOK),
         (Path("/repo/Pack/Scripts/MyScript/MyScript.py"), ComponentType.AUTOMATION),
         (Path("/repo/Pack/Automations/MyAuto/MyAuto.yml"), ComponentType.AUTOMATION),
-        (Path("/repo/Pack/Integrations/MyInt/MyInt.yml"), ComponentType.INTEGRATION_COMMAND),
+        (Path("/repo/Pack/Integrations/MyInt/MyInt.yml"), ComponentType.INTEGRATION),
         (Path("/repo/Pack/Layouts/layout-MyLayout.json"), ComponentType.LAYOUT),
         (Path("/repo/Pack/Lists/list-MyList.json"), ComponentType.LIST),
         (Path("/repo/Pack/Classifiers/classifier-Triage.json"), ComponentType.CLASSIFIER),
@@ -356,7 +357,7 @@ def test_no_tasks_returns_empty():
         # flat repo (prefix-based)
         (Path("/repo/playbook-Something.yml"), ComponentType.PLAYBOOK),
         (Path("/repo/automation-Something.yml"), ComponentType.AUTOMATION),
-        (Path("/repo/integration-Something.yml"), ComponentType.INTEGRATION_COMMAND),
+        (Path("/repo/integration-Something.yml"), ComponentType.INTEGRATION),
         (Path("/repo/layout-MyLayout.json"), ComponentType.LAYOUT),
         (Path("/repo/list-MyList.json"), ComponentType.LIST),
         (Path("/repo/classifier-Triage.json"), ComponentType.CLASSIFIER),
@@ -397,3 +398,23 @@ def test_source_name_from_path(path, expected):
 def test_source_name_prefers_yaml_name_field():
     path = Path("/repo/playbook-Irrelevant.yml")
     assert _source_name_from_path(path, {"name": "The Real Name"}) == "The Real Name"
+
+
+# --- ripgrep source filtering ---
+
+
+def test_ripgrep_hit_from_invalid_source_is_excluded(tmp_path):
+    # A list file contains the target name in its own id/name fields — should be noise.
+    (tmp_path / "list-agent-mail-rule-analyst.json").write_text(
+        '{"id": "agent-mail-rule-analyst", "name": "agent-mail-rule-analyst"}'
+    )
+    result = scan(tmp_path, "agent-mail-rule-analyst", ComponentType.LIST)
+    # Only valid source for LIST is PLAYBOOK/AUTOMATION; hits from list files must be dropped.
+    assert all(r.source_type != ComponentType.LIST for r in result.refs)
+
+
+def test_ripgrep_hit_from_valid_source_is_included(tmp_path):
+    # An incidenttype file references a layout by name — a valid relationship.
+    (tmp_path / "incidenttype-Alert.json").write_text('{"layout": "My Layout", "name": "Alert"}')
+    result = scan(tmp_path, "My Layout", ComponentType.LAYOUT)
+    assert any(r.source_type == ComponentType.INCIDENT_TYPE for r in result.refs)

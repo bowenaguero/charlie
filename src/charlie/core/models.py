@@ -14,6 +14,7 @@ class ComponentType(str, Enum):
     LIST = "list"
     CLASSIFIER = "classifier"
     INCIDENT_TYPE = "incidenttype"
+    INTEGRATION = "integration"
 
 
 class MatchKind(str, Enum):
