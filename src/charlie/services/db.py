@@ -97,12 +97,22 @@ def list_components(
     db_path: Path,
     component_type: ComponentType | None = None,
 ) -> list[tuple[str, ComponentType]]:
+    # components table holds sources (playbooks only); refs table holds all targets.
+    # UNION gives the full set of known component names across both roles.
     with _connect(db_path) as conn:
         if component_type is not None:
             rows = conn.execute(
-                "SELECT name, type FROM components WHERE type = ? ORDER BY name",
-                (component_type.value,),
+                """SELECT name, type FROM components WHERE type = ?
+                   UNION
+                   SELECT DISTINCT target_name AS name, target_type AS type FROM refs WHERE target_type = ?
+                   ORDER BY name""",
+                (component_type.value, component_type.value),
             ).fetchall()
         else:
-            rows = conn.execute("SELECT name, type FROM components ORDER BY type, name").fetchall()
+            rows = conn.execute(
+                """SELECT name, type FROM components
+                   UNION
+                   SELECT DISTINCT target_name AS name, target_type AS type FROM refs
+                   ORDER BY type, name"""
+            ).fetchall()
     return [(row["name"], ComponentType(row["type"])) for row in rows]
