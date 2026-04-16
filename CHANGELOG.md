@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.4](https://github.com/bowenaguero/charlie/compare/charlie-v0.1.3...charlie-v0.1.4) (2026-04-16)
+
+
+### Features
+
+* add new component types and update scanner logic ([#8](https://github.com/bowenaguero/charlie/issues/8)) ([92cc9c2](https://github.com/bowenaguero/charlie/commit/92cc9c2ec5a65746284cc8bab320103f26b552e1))
+* reference relationship filtering and INTEGRATION source type ([#10](https://github.com/bowenaguero/charlie/issues/10)) ([552c2a3](https://github.com/bowenaguero/charlie/commit/552c2a356d852267dd66054b5b4784f5e448354f))
+
 ## [0.1.3](https://github.com/bowenaguero/charlie/compare/charlie-v0.1.2...charlie-v0.1.3) (2026-04-16)
 
 
