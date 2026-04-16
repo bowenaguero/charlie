@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from charlie.core.models import ComponentType, MatchKind
-from charlie.services.db import init_db, query_refs
+from charlie.services.db import init_db, list_components, query_refs
 
 
 @pytest.fixture()
@@ -85,3 +85,38 @@ def test_query_wrong_type_no_match(db_path):
     # "MyAutomation" exists as automation, not playbook
     result = query_refs(db_path, "MyAutomation", ComponentType.PLAYBOOK)
     assert result.refs == []
+
+
+def test_list_components_returns_all_types(db_path):
+    conn = sqlite3.connect(db_path)
+    conn.execute(
+        "INSERT INTO components (name, type, file_path) VALUES (?, ?, ?)",
+        ("Alert", ComponentType.INCIDENT_TYPE.value, "/repo/incidenttype-Alert.json"),
+    )
+    conn.execute(
+        "INSERT INTO components (name, type, file_path) VALUES (?, ?, ?)",
+        ("My Playbook", ComponentType.PLAYBOOK.value, "/repo/playbook-My.yml"),
+    )
+    conn.commit()
+    conn.close()
+    results = list_components(db_path)
+    types = {ct for _, ct in results}
+    assert ComponentType.INCIDENT_TYPE in types
+    assert ComponentType.PLAYBOOK in types
+
+
+def test_list_components_filtered_by_type(db_path):
+    conn = sqlite3.connect(db_path)
+    conn.execute(
+        "INSERT INTO components (name, type, file_path) VALUES (?, ?, ?)",
+        ("Alert", ComponentType.INCIDENT_TYPE.value, "/repo/incidenttype-Alert.json"),
+    )
+    conn.execute(
+        "INSERT INTO components (name, type, file_path) VALUES (?, ?, ?)",
+        ("My Playbook", ComponentType.PLAYBOOK.value, "/repo/playbook-My.yml"),
+    )
+    conn.commit()
+    conn.close()
+    results = list_components(db_path, ComponentType.INCIDENT_TYPE)
+    assert len(results) == 1
+    assert results[0] == ("Alert", ComponentType.INCIDENT_TYPE)

@@ -354,6 +354,8 @@ def test_no_tasks_returns_empty():
         (Path("/repo/Pack/Lists/list-MyList.json"), ComponentType.LIST),
         (Path("/repo/Pack/Classifiers/classifier-Triage.json"), ComponentType.CLASSIFIER),
         (Path("/repo/Pack/IncidentTypes/incidenttype-Alert.json"), ComponentType.INCIDENT_TYPE),
+        (Path("/repo/Pack/IncidentFields/incidentfield-Severity.json"), ComponentType.FIELD),
+        (Path("/repo/Pack/IndicatorFields/indicatorfield-Tag.json"), ComponentType.FIELD),
         # flat repo (prefix-based)
         (Path("/repo/playbook-Something.yml"), ComponentType.PLAYBOOK),
         (Path("/repo/automation-Something.yml"), ComponentType.AUTOMATION),
@@ -362,6 +364,8 @@ def test_no_tasks_returns_empty():
         (Path("/repo/list-MyList.json"), ComponentType.LIST),
         (Path("/repo/classifier-Triage.json"), ComponentType.CLASSIFIER),
         (Path("/repo/incidenttype-Alert.json"), ComponentType.INCIDENT_TYPE),
+        (Path("/repo/incidentfield-Severity.json"), ComponentType.FIELD),
+        (Path("/repo/indicatorfield-Tag.json"), ComponentType.FIELD),
         # fallback
         (Path("/repo/README.md"), ComponentType.PLAYBOOK),
     ],

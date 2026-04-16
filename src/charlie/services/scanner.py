@@ -23,6 +23,8 @@ _DIR_TO_TYPE: dict[str, ComponentType] = {
     "Lists": ComponentType.LIST,
     "Classifiers": ComponentType.CLASSIFIER,
     "IncidentTypes": ComponentType.INCIDENT_TYPE,
+    "IncidentFields": ComponentType.FIELD,
+    "IndicatorFields": ComponentType.FIELD,
 }
 
 # Filename prefix → type (flat repos where everything lives at root)
@@ -35,6 +37,8 @@ _PREFIX_TO_TYPE: dict[str, ComponentType] = {
     "list": ComponentType.LIST,
     "classifier": ComponentType.CLASSIFIER,
     "incidenttype": ComponentType.INCIDENT_TYPE,
+    "incidentfield": ComponentType.FIELD,
+    "indicatorfield": ComponentType.FIELD,
 }
 
 _TYPE_DIR_NAMES = {
