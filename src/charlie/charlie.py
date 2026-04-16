@@ -8,6 +8,7 @@ from rich.console import Console
 from . import __version__
 from .commands.reindex import reindex
 from .commands.scan import scan
+from .commands.search import search
 from .commands.setup import setup
 from .core.config import Config
 from .services.updater import UpdateChecker
@@ -42,4 +43,5 @@ def _main(
 
 app.command()(setup)
 app.command()(scan)
+app.command()(search)
 app.command()(reindex)

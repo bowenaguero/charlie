@@ -13,6 +13,7 @@ dependencies = [
     "pyvis>=0.3.2",
     "rich>=13.0.0",
     "platformdirs>=4.0.0",
+    "InquirerPy>=0.3.4",
 ]
 classifiers = [
     "Intended Audience :: Developers",
@@ -107,6 +108,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101", "PGH003"]
 "src/charlie/commands/scan.py" = ["B008"]
+"src/charlie/commands/search.py" = ["B008"]
 "src/charlie/commands/setup.py" = ["S603", "S607"]
 "src/charlie/services/scanner.py" = ["S603", "S607"]
 "src/charlie/services/xsoar_downloader.py" = ["S603", "S607", "TRY003"]
