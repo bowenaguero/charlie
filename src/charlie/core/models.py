@@ -10,6 +10,10 @@ class ComponentType(str, Enum):
     AUTOMATION = "automation"
     INTEGRATION_COMMAND = "integration-command"
     FIELD = "field"
+    LAYOUT = "layout"
+    LIST = "list"
+    CLASSIFIER = "classifier"
+    INCIDENT_TYPE = "incidenttype"
 
 
 class MatchKind(str, Enum):
