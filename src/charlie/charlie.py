@@ -12,7 +12,7 @@ from .commands.setup import setup
 from .core.config import Config
 from .services.updater import UpdateChecker
 
-app = typer.Typer(help="Map XSOAR content pack dependencies.", add_completion=False)
+app = typer.Typer(help="Map XSOAR content pack dependencies.", add_completion=False, no_args_is_help=True)
 
 _console = Console()
 
