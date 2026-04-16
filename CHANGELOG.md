@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/bowenaguero/charlie/compare/charlie-v0.1.2...charlie-v0.1.3) (2026-04-16)
+
+
+### Features
+
+* version check and update notification ([#6](https://github.com/bowenaguero/charlie/issues/6)) ([2d3c512](https://github.com/bowenaguero/charlie/commit/2d3c5126d6594f551006f5bcd16a45be911c984e))
+
 ## [0.1.2](https://github.com/bowenaguero/charlie/compare/charlie-v0.1.1...charlie-v0.1.2) (2026-04-15)
 
 
