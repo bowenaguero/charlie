@@ -18,7 +18,7 @@ _DIR_TO_TYPE: dict[str, ComponentType] = {
     "Playbooks": ComponentType.PLAYBOOK,
     "Scripts": ComponentType.AUTOMATION,
     "Automations": ComponentType.AUTOMATION,
-    "Integrations": ComponentType.INTEGRATION_COMMAND,
+    "Integrations": ComponentType.INTEGRATION,
     "Layouts": ComponentType.LAYOUT,
     "Lists": ComponentType.LIST,
     "Classifiers": ComponentType.CLASSIFIER,
@@ -30,7 +30,7 @@ _PREFIX_TO_TYPE: dict[str, ComponentType] = {
     "playbook": ComponentType.PLAYBOOK,
     "automation": ComponentType.AUTOMATION,
     "script": ComponentType.AUTOMATION,
-    "integration": ComponentType.INTEGRATION_COMMAND,
+    "integration": ComponentType.INTEGRATION,
     "layout": ComponentType.LAYOUT,
     "list": ComponentType.LIST,
     "classifier": ComponentType.CLASSIFIER,
@@ -79,6 +79,20 @@ _FIELD_SETTERS = frozenset({
     "Builtin|||setIndicator",
 })
 
+# Maps each target type to the source types that can meaningfully reference it.
+# Ripgrep hits from sources not in this set are noise (e.g. a list file matching its own name).
+_VALID_REF_SOURCES: dict[ComponentType, frozenset[ComponentType]] = {
+    ComponentType.PLAYBOOK: frozenset({ComponentType.PLAYBOOK, ComponentType.INCIDENT_TYPE}),
+    ComponentType.AUTOMATION: frozenset({ComponentType.PLAYBOOK, ComponentType.AUTOMATION}),
+    ComponentType.INTEGRATION_COMMAND: frozenset({ComponentType.PLAYBOOK, ComponentType.AUTOMATION}),
+    ComponentType.FIELD: frozenset({ComponentType.PLAYBOOK, ComponentType.LAYOUT}),
+    ComponentType.LAYOUT: frozenset({ComponentType.INCIDENT_TYPE}),
+    ComponentType.LIST: frozenset({ComponentType.PLAYBOOK, ComponentType.AUTOMATION}),
+    ComponentType.CLASSIFIER: frozenset({ComponentType.INTEGRATION}),
+    ComponentType.INCIDENT_TYPE: frozenset({ComponentType.CLASSIFIER, ComponentType.FIELD}),
+    ComponentType.INTEGRATION: frozenset(),
+}
+
 
 def scan(repo: Path, target: str, target_type: ComponentType, db_path: Path | None = None) -> ScanResult:
     if db_path is not None and db_path.exists():
@@ -91,10 +105,12 @@ def scan(repo: Path, target: str, target_type: ComponentType, db_path: Path | No
             source_name = _source_name(file_path, yaml_data)
             result.refs.extend(_scan_playbook_yaml(file_path, yaml_data, target, target_type, source_name))
 
-    # Ripgrep sweep for unstructured refs not already captured by structured parsing
+    # Ripgrep sweep for unstructured refs not already captured by structured parsing.
+    # Filter to only source types that can meaningfully reference this target type.
+    valid_sources = _VALID_REF_SOURCES.get(target_type, frozenset())
     structured = {(r.location.file, r.location.line) for r in result.refs}
     for ref in _scan_ripgrep(repo, target):
-        if (ref.location.file, ref.location.line) not in structured:
+        if (ref.location.file, ref.location.line) not in structured and ref.source_type in valid_sources:
             result.refs.append(ref)
 
     return result
@@ -173,7 +189,13 @@ def _match_task(
             return _match_command_task(file_path, task_id, task_def, task_type, target, source_name)
         case ComponentType.FIELD:
             return _match_field_task(file_path, task_id, task_entry, task_def, target, source_name)
-        case ComponentType.LAYOUT | ComponentType.LIST | ComponentType.CLASSIFIER | ComponentType.INCIDENT_TYPE:
+        case (
+            ComponentType.LAYOUT
+            | ComponentType.LIST
+            | ComponentType.CLASSIFIER
+            | ComponentType.INCIDENT_TYPE
+            | ComponentType.INTEGRATION
+        ):
             return []
     return []
 
